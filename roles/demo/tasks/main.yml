@@ -1,0 +1,3 @@
+---
+- include: bootstrapping.yml
+- include: provisioning.yml

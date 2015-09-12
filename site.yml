@@ -1,0 +1,6 @@
+---
+- name: sacloud module demo
+  hosts: localhost
+  sudo: no
+  roles:
+    - demo
