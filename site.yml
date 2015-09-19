@@ -3,4 +3,5 @@
   hosts: localhost
   sudo: no
   roles:
+    - knakayama.sacloud
     - demo
