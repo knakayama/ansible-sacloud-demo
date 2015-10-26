@@ -1,1 +1,4 @@
-roles/knakayama.sacloud
+.envrc
+hosts.yml
+knakayama.sacloud
+keys

@@ -1,7 +1,0 @@
----
-- name: sacloud module demo
-  hosts: localhost
-  sudo: no
-  roles:
-    - knakayama.sacloud
-    - demo
