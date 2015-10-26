@@ -1,0 +1,44 @@
+---
+# Don't use ansible module as it requires fstab update.
+# Defining fstab=/dev/null brakes the task.
+- name: Mount virtual filesystems for grub installation
+  shell: |
+    mount -o bind -t {{ item.type }} /{{ item.path }} /rpool/ROOT/ubuntu/{{ item.path }}
+  with_items:
+    - { path: 'proc', type: 'proc' }
+    - { path: 'sys', type: 'sysfs' }
+    - { path: 'dev', type: 'devtmpfs' }
+
+- name: Update device list with udevadm
+  shell: |
+    udevadm trigger
+  changed_when: false
+
+- name: Execute update-grub
+  shell: |
+    chroot /rpool/ROOT/ubuntu update-grub
+
+- name: Install grub on zfs root drive
+  shell: |
+    grub-install --boot-directory=/rpool/ROOT/ubuntu/boot {{ root_drive }}
+
+- name: Unmount bind filesystems
+  mount:
+    name: "{{ item.name }}"
+    src: "{{ item.src }}"
+    fstype: "{{ item.type }}"
+    state: unmounted
+  with_items:
+    - { name: '/rpool/ROOT/ubuntu/proc', src: '/proc', type: 'proc' }
+    - { name: '/rpool/ROOT/ubuntu/sys', src: '/sys', type: 'sysfs' }
+    - { name: '/rpool/ROOT/ubuntu/dev', src: '/dev', type: 'devtmpfs' }
+    - { name: '/mnt/tmp', src: '/', type: 'none' }
+
+- name: Remove zpool cache file
+  file:
+    path: /etc/zfs/zpool.cache
+    state: absent
+
+- name: Update initramfs
+  shell: |
+    update-initramfs -u

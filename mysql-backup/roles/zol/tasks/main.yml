@@ -1,0 +1,12 @@
+---
+- include: zol-prep.yml
+  tags:
+    - zol-prep
+
+- include: zol-setup.yml
+  tags:
+    - zol-setup
+
+- include: zol-grub.yml
+  tags:
+    - zol-grub

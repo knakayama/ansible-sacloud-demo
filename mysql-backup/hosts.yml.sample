@@ -1,0 +1,13 @@
+---
+localhost:
+  hosts:
+    - 127.0.0.1
+
+db:
+ hosts:
+   - db01.example.com
+   - db02.example.com
+
+tank:
+ hosts:
+   - tank01.example.com

@@ -1,0 +1,4 @@
+---
+- include: present.yml
+- include: connect.yml
+- include: boot.yml

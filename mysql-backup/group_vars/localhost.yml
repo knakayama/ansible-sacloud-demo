@@ -1,0 +1,6 @@
+---
+zone: is1b
+sacloud_servers:
+  - { name: db1, cpu: 1, mem: 2, desc: db, size_gib: 100 }
+  - { name: db2, cpu: 1, mem: 2, desc: db, size_gib: 100 }
+  - { name: tank1, cpu: 2, mem: 4, desc: tank, size_gib: 250 }

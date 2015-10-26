@@ -1,0 +1,20 @@
+---
+- name: Import public key
+  apt_key:
+    keyserver: keys.gnupg.net
+    id: 1C4CBDCDCD2EFD2A
+    state: present
+
+- name: Add percona apt repository
+  apt_repository:
+    repo: "{{ item }}"
+    update_cache: yes
+    state: present
+  with_items:
+    - 'deb http://repo.percona.com/apt trusty main'
+    - 'deb-src http://repo.percona.com/apt trusty main'
+
+- name: Install xtrabackup
+  apt:
+    name: percona-xtrabackup
+    state: present

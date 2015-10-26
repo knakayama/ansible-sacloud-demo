@@ -1,0 +1,8 @@
+---
+- include: hostname.yml
+  tags:
+    - hostname
+
+- include: apt.yml
+  tags:
+    - apt

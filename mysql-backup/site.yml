@@ -1,0 +1,23 @@
+---
+- name: Bootstrap sacloud servers
+  hosts: localhost
+  connection: local
+  become: no
+  gather_facts: no
+  roles:
+    - { role: knakayama.sacloud, tags: [ bootstrap ] }
+    - { role: bootstrap,         tags: [ bootstrap ] }
+
+- name: Provision mysql server
+  hosts: db
+  roles:
+    - { role: common, tags: [ common ] }
+    - { role: mysql-master,  tags: [ mysql-master ] }
+    #- { role: mysql-util, tags: [ mysql-util ] }
+
+- name: Provision tank server
+  hosts: tank
+  roles:
+    - { role: common,  tags: [ common ] }
+    #- { role: zol,    tags: [ zol ] }
+    - { role: mysql-slave, tags: [ mysql-slave ] }

@@ -1,4 +1,5 @@
 .envrc
 hosts.yml
 knakayama.sacloud
-keys
+*/keys/*
+!*/keys/.gitkeep

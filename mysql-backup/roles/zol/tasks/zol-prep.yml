@@ -1,0 +1,41 @@
+---
+- name: Install Utility packages
+  apt:
+    name: "{{ item }}"
+    state: present
+  with_items:
+    - lsscsi
+    - sg3-utils
+    - software-properties-common
+
+- name: Add zol Repository
+  apt_repository:
+    repo: ppa:zfs-native/stable
+    state: present
+  register: zol_repo_status
+
+- name: Update apt-cache
+  apt:
+    update_cache: yes
+  when: zol_repo_status|changed
+
+- name: Install zol packages
+  apt:
+    name: "{{ item }}"
+    state: present
+  with_items:
+    - ubuntu-zfs
+    - zfs-initramfs
+
+- name: Check if zfs module already loaded
+  shell: |
+    lsmod
+  register: zfs_module
+  failed_when: false
+  always_run: true
+  changed_when: false
+
+- name: Load zfs module
+  shell: |
+    modprobe zfs
+  when: zfs_module.stdout.find('zfs') != 0

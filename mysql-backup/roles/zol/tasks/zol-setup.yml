@@ -1,0 +1,98 @@
+---
+- name: Add udev rule
+  copy:
+    src: etc/udev/rules.d/90-zfs-vdev.rules
+    dest: /etc/udev/rules.d/90-zfs-vdev.rules
+    owner: root
+    group: root
+    mode: 0644
+
+- name: Check if zfs pool exists
+  shell: |
+    zpool list
+  register: zpool_list
+  failed_when: false
+  always_run: true
+  changed_when: false
+
+- name: Clean up existing rpool
+  shell: |
+    zpool destroy -f rpool
+  when: "'rpool' in zpool_list.stdout"
+
+- name: Remove existing MBR and GPT partition tables from zfs root drive
+  shell: |
+    sgdisk --zap-all {{ root_drive }}
+
+- name: Upload partition layout file
+  copy:
+    src: tmp/partition_table.dat
+    dest: /tmp/partition_table.dat
+
+- name: Create new partition layout on zfs root drive
+  shell: |
+    sfdisk --force -q -uS {{ root_drive }} < /tmp/partition_table.dat
+  ignore_errors: true
+
+- name: Run partprobe
+  shell: |
+    partprobe {{ root_drive }}
+  ignore_errors: true
+
+- name: Update device list with udevadm
+  shell: |
+    udevadm trigger
+  changed_when: false
+
+#- name: Get root drive partition using /dev/disk/by-uuid
+#  shell: |
+#    ls -l /dev/disk/by-uuid | grep -v wwn | awk '/{{ root_drive | basename }}/ {print $(NF-2)}'
+#  register: root_drive_device
+#  changed_when: false
+
+- name: Create new rpool
+  shell: |
+    zpool create -d \
+      -o feature@async_destroy=enabled \
+      -o feature@empty_bpobj=enabled \
+      -o feature@lz4_compress=enabled \
+      -o ashift=12 \
+      -O compression=lz4 \
+      -f rpool {{ root_drive }}
+
+- name: Create ROOT and Ubuntu datasets
+  zfs:
+    name: "{{ item }}"
+    state: present
+  with_items:
+    - rpool/ROOT
+    - rpool/ROOT/ubuntu
+
+- name: Create temporary directory for Bind Mount
+  file:
+    path: /mnt/tmp
+    state: directory
+
+- name: Perfrom bind mount of existing root filesystem
+  shell: |
+    mount -o rw,bind / /mnt/tmp
+
+- name: Copy existing root to new zfs root dataset
+  shell: |
+    rsync -avPX /mnt/tmp/. /rpool/ROOT/ubuntu/.
+
+- name: Clean up /etc/fstab on rpool dataset
+  copy:
+    src: rpool/ROOT/ubuntu/etc/fstab
+    dest: /rpool/ROOT/ubuntu/etc/fstab
+    owner: root
+    group: root
+    mode: 0644
+
+- name: Update grub configuration file
+  copy:
+    src: rpool/ROOT/ubuntu/etc/default/grub
+    dest: /rpool/ROOT/ubuntu/etc/default/grub
+    owner: root
+    group: root
+    mode: 0644
