@@ -1,11 +1,18 @@
 ---
-- name: Build phpMyAdmin Standalone Server
-  hosts: all
+- name: Bootstrap phpMyAdmin Standalone Server
+  hosts: localhost
+  connection: local
+  gather_facts: false
+  become: false
   roles:
-    - { role: knakayama.sacloud, tags: [ knakayama.sacloud ] }
+    - { role: knakayama.sacloud, tags: [ bootstrap ] }
     - { role: bootstrap,         tags: [ bootstrap ] }
-    - { role: common,            tags: [ common ] }
-    - { role: mysql,             tags: [ mysql ] }
-    - { role: nginx,             tags: [ nginx ] }
-    - { role: php5-fpm,          tags: [ php5-fpm ] }
-    - { role: phpmyadmin,        tags: [ phpmyadmin ] }
+
+- name: Provision phpMyAdmin Standalone Server
+  hosts: phpmyadmin
+  roles:
+    - { role: common,     tags: [ common ] }
+    - { role: mysql,      tags: [ mysql ] }
+    - { role: nginx,      tags: [ nginx ] }
+    - { role: php5-fpm,   tags: [ php5-fpm ] }
+    - { role: phpmyadmin, tags: [ phpmyadmin ] }

@@ -29,7 +29,7 @@ $ $EDITOR hosts.yml
 ## Create ssh keys
 
 ```bash
-$ ssh-keygen -f keys/id_isa
+$ ssh-keygen -f keys/id_rsa
 ```
 
 ## Install sacloud library via ansible-galaxy
@@ -41,11 +41,11 @@ $ ansible-galaxy install -r install_roles.yml
 ## Bootstrapping
 
 ```bash
-$ ansible-playbook -i ./bin/hosts.py site.yml --limit localhost --tags bootstrap --connect local -vvv
+$ ansible-playbook -i ./bin/hosts.py site.yml --limit localhost -vvv
 ```
 
 ## Provisioning
 
 ```bash
-$ ansible-playbook -i ./bin/hosts.py site.yml --limit phpmyadmin --skip-tags bootstrap -vvv
+$ ansible-playbook -i ./bin/hosts.py site.yml --limit phpmyadmin -vvv
 ```
