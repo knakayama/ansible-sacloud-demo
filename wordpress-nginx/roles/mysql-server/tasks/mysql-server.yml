@@ -1,0 +1,23 @@
+---
+- name: Install mysql-server and python-mysqldb
+  apt:
+    name: "{{ item }}"
+    state: present
+  with_items:
+    - mysql-server
+    - python-mysqldb
+
+- name: Copy my.cnf
+  copy:
+    src: my.cnf
+    dest: /etc/mysql/my.cnf
+    owner: root
+    group: root
+    mode: 0644
+  notify: Restart mysql server
+
+- name: Be sure mysql-server enabled and started
+  service:
+    name: mysql
+    enabled: yes
+    state: started

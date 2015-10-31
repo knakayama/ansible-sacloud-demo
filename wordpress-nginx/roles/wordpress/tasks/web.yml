@@ -1,0 +1,43 @@
+---
+- name: Download WordPress
+  get_url:
+    url: https://wordpress.org/latest.tar.gz
+    dest: /srv/wordpress-latest.tar.gz
+
+- name: Extract archive
+  unarchive:
+    src: /srv/wordpress-latest.tar.gz
+    dest: /srv
+    copy: no
+
+- name: Add group wordpress
+  group:
+    name: wordpress
+    state: present
+
+- name: Add user wordpress
+  user:
+    name: wordpress
+    group: wordpress
+    home: /srv/wordpress
+    state: present
+
+- name: Fetch random salts for WordPress config
+  become: false
+  connection: local
+  shell: |
+    curl https://api.wordpress.org/secret-key/1.1/salt/
+  register: wp_salt
+
+- name: Copy WordPress config file
+  template:
+    src: wp-config.php.j2
+    dest: /srv/wordpress/wp-config.php
+
+- name: Change ownership of WordPress installation
+  file:
+    path: /srv/wordpress/
+    owner: wordpress
+    group: wordpress
+    recurse: yes
+    state: directory

@@ -1,0 +1,6 @@
+---
+- include: web.yml
+  when: "'web' in group_names"
+
+- include: db.yml
+  when: "'db' in group_names"

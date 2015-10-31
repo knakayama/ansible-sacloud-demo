@@ -1,0 +1,25 @@
+---
+- name: Bootstrap sacloud resources
+  hosts: localhost
+  connection: local
+  gather_facts: false
+  become: false
+  roles:
+    - { role: knakayama.sacloud, tags: [ bootstrap ] }
+    - { role: bootstrap,         tags: [ bootstrap ] }
+
+- name: Provision db server
+  hosts: db
+  roles:
+    - { role: common,       tags: [ common ] }
+    - { role: mysql-server, tags: [ mysql-server ] }
+    - { role: wordpress,    tags: [ wordpress ] }
+
+- name: Provision web server
+  hosts: web
+  roles:
+    - { role: common,       tags: [ common ] }
+    - { role: mysql-client, tags: [ mysql-client ] }
+    - { role: nginx,        tags: [ nginx ] }
+    - { role: php5-fpm,     tags: [ php5-fpm ] }
+    - { role: wordpress,    tags: [ wordpress ] }
