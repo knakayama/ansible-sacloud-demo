@@ -1,0 +1,22 @@
+---
+- name: Install php5-fpm and php5-mysql
+  apt:
+    pkg: "{{ item }}"
+    state: present
+  with_items:
+    - php5-fpm
+    - php5-mysql
+
+- name: Adjust php.ini
+  lineinfile:
+    dest: /etc/php5/fpm/php.ini
+    state: present
+    create: yes
+    regexp: "{{ item.regexp }}"
+    line: "{{ item.line }}"
+  with_items:
+    - regexp: '^;?date.timezone ='
+      line: date.timezone = "Asia/Tokyo"
+    - regexp: '(;\s)?max_input_vars ='
+      line: max_input_vars = 2000
+  notify: Restart php5-fpm
