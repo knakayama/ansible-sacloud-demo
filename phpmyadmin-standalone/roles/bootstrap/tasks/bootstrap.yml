@@ -31,7 +31,7 @@
     size_gib: 20
     name: phpmyadmin
     config_host_name: phpmyadmin01.example.com
-    config_ipv4_address: "{{ sacloud_ipv4_addressess.0 }}"
+    config_ipv4_address: "{{ sacloud_ipv4_addresses.0 }}"
     config_ssh_key: "{{ lookup('file', '../../../keys/id_rsa.pub') }}"
     config_network_mask_len: 28
     config_default_route: "{{ sacloud_default_route }}"
